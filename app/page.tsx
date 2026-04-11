@@ -36,16 +36,16 @@ export default function Home() {
             POST /api/webhook
           </code>
 
-          <h2>Fonctionnalités Activées</h2>
+          <h2>Features Enabled</h2>
           <ul>
-            <li>✅ Réception des données Tally</li>
+            <li>✅ Reception des donnees Tally</li>
             <li>✅ Sauvegarde en base Notion</li>
-            <li>✅ Envoi d'email de remerciement</li>
-            <li>✅ Suivi du statut d'envoi</li>
+            <li>✅ Envoi d&apos;email de remerciement</li>
+            <li>✅ Suivi du statut d&apos;envoi</li>
           </ul>
 
           <p style={{ marginTop: "20px", color: "#666", fontSize: "14px" }}>
-            Connecte le webhook Tally à:{" "}
+            Connecte le webhook Tally a:{" "}
             <code>https://[ton-domaine-vercel]/api/webhook</code>
           </p>
         </div>
