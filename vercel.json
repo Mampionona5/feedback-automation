@@ -1,19 +1,5 @@
 {
   "buildCommand": "npm run build",
   "devCommand": "npm run dev",
-  "installCommand": "npm install",
-  "env": {
-    "NOTION_API_KEY": {
-      "description": "Clé API Notion"
-    },
-    "NOTION_CLIENTS_DATABASE_ID": {
-      "description": "ID de la table Clients Notion"
-    },
-    "NOTION_FEEDBACK_DATABASE_ID": {
-      "description": "ID de la table Avis Notion"
-    },
-    "RESEND_API_KEY": {
-      "description": "Clé API Resend"
-    }
-  }
+  "installCommand": "npm install"
 }
