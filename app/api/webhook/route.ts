@@ -3,27 +3,53 @@ import { addClientToNotion, addFeedbackToNotion, updateFeedbackEmailSent } from 
 import { sendThankYouEmail } from "@/lib/email";
 
 // Types pour les données Tally
-interface TallyFormData {
-  data: {
-    "À quel atelier avez-vous participé ?"?: string;
-    "Quand ?"?: string;
-    "Comment évaluez-vous le contenu en général ?"?: number;
-    "Quelle est votre niveau de satisfaction général ?"?: number;
-    "Qu'avez-vous le plus apprécié ?"?: string;
-    "Quels aspects mériteraient d'être repensés ?"?: string;
-    "Votre prénom"?: string;
-    "Votre email"?: string;
-    "Votre numéro téléphone"?: string;
-  };
+interface TallyField {
+  key: string;
+  label: string;
+  type: string;
+  value: string | number | null;
+}
+
+interface TallyData {
+  responseId: string;
+  formId: string;
+  fields: TallyField[];
+}
+
+interface TallyPayload {
+  eventId: string;
+  eventType: string;
+  data: TallyData;
+}
+
+// Fonction pour convertir le tableau fields en objet
+function parseFields(fields: TallyField[]): Record<string, any> {
+  const result: Record<string, any> = {};
+  fields.forEach((field) => {
+    result[field.label] = field.value;
+  });
+  return result;
 }
 
 export async function POST(request: NextRequest) {
   try {
-    const body = (await request.json()) as TallyFormData;
-    const { data } = body;
+    const body = (await request.json()) as TallyPayload;
+
+    if (body.eventType !== "FORM_RESPONSE") {
+      return NextResponse.json(
+        { message: "Event type not FORM_RESPONSE, ignoring" },
+        { status: 200 }
+      );
+    }
+
+    const fields = parseFields(body.data.fields);
 
     // Validation des données requises
-    if (!data["Votre prénom"] || !data["Votre email"]) {
+    const prenom = fields["Votre prénom"];
+    const email = fields["Votre email"];
+
+    if (!prenom || !email) {
+      console.error("[Webhook] Données manquantes:", { prenom, email });
       return NextResponse.json(
         { error: "Prénom et email sont requis" },
         { status: 400 }
@@ -31,37 +57,46 @@ export async function POST(request: NextRequest) {
     }
 
     console.log("[Webhook Tally] Données reçues:", {
-      nom: data["Votre prénom"],
-      email: data["Votre email"],
+      prenom,
+      email,
+      allFields: Object.keys(fields),
     });
 
     // 1. Ajouter le client à Notion
     const clientId = await addClientToNotion({
-      name: data["Votre prénom"],
-      email: data["Votre email"],
-      phone: data["Votre numéro téléphone"],
+      name: prenom,
+      email: email,
+      phone: fields["Votre numéro téléphone"],
     });
 
     console.log("[Notion] Client ajouté:", clientId);
 
     // 2. Ajouter le feedback à Notion
+    const noteContenu =
+      fields["Comment évaluez vous le contenu en général ?"] ||
+      fields["Comment évaluez-vous le contenu en général ?"] ||
+      0;
+    
+    const noteGlobale =
+      fields["Quelle est votre niveau de satisfaction général ?"] || 0;
+
     const feedbackId = await addFeedbackToNotion({
       clientId,
-      noteContenu: data["Comment évaluez-vous le contenu en général ?"] || 0,
-      noteGlobale: data["Quelle est votre niveau de satisfaction général ?"] || 0,
-      appreciation: data["Qu'avez-vous le plus apprécié ?"],
-      aspects: data["Quels aspects mériteraient d'être repensés ?"],
-      atelier: data["À quel atelier avez-vous participé ?"],
+      noteContenu: Number(noteContenu),
+      noteGlobale: Number(noteGlobale),
+      appreciation: fields["Qu'avez vous le plus apprécié ?"],
+      aspects: fields["Quels aspects mériteraient d'être repensés ?"],
+      atelier: fields["À quel atelier avez-vous participé ?"],
     });
 
     console.log("[Notion] Feedback ajouté:", feedbackId);
 
     // 3. Envoyer l'email de remerciement
     const emailResponse = await sendThankYouEmail({
-      to: data["Votre email"],
-      name: data["Votre prénom"],
-      rating: data["Quelle est votre niveau de satisfaction général ?"] || 0,
-      feedback: data["Qu'avez-vous le plus apprécié ?"],
+      to: email,
+      name: prenom,
+      rating: Number(noteGlobale),
+      feedback: fields["Qu'avez vous le plus apprécié ?"],
     });
 
     console.log("[Email] Remerciement envoyé:", emailResponse);
