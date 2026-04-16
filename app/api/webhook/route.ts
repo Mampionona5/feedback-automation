@@ -33,7 +33,9 @@ function parseFields(fields: TallyField[]): Record<string, any> {
 
 export async function POST(request: NextRequest) {
   try {
+    console.log("[Webhook] Requête reçue");
     const body = (await request.json()) as TallyPayload;
+    console.log("[Webhook] Body parsé:", JSON.stringify(body).substring(0, 200));
 
     if (body.eventType !== "FORM_RESPONSE") {
       return NextResponse.json(
@@ -63,6 +65,7 @@ export async function POST(request: NextRequest) {
     });
 
     // 1. Ajouter le client à Notion
+    console.log("[Notion] Tentative d'ajout client...");
     const clientId = await addClientToNotion({
       name: prenom,
       email: email,
@@ -72,6 +75,7 @@ export async function POST(request: NextRequest) {
     console.log("[Notion] Client ajouté:", clientId);
 
     // 2. Ajouter le feedback à Notion
+    console.log("[Notion] Tentative d'ajout feedback...");
     const noteContenu =
       fields["Comment évaluez vous le contenu en général ?"] ||
       fields["Comment évaluez-vous le contenu en général ?"] ||
@@ -92,6 +96,7 @@ export async function POST(request: NextRequest) {
     console.log("[Notion] Feedback ajouté:", feedbackId);
 
     // 3. Envoyer l'email de remerciement
+    console.log("[Email] Tentative d'envoi...");
     const emailResponse = await sendThankYouEmail({
       to: email,
       name: prenom,
@@ -102,6 +107,7 @@ export async function POST(request: NextRequest) {
     console.log("[Email] Remerciement envoyé:", emailResponse);
 
     // 4. Mettre à jour le feedback pour indiquer que l'email a été envoyé
+    console.log("[Notion] Mise à jour du statut email...");
     await updateFeedbackEmailSent(feedbackId);
 
     console.log("[Notion] Statut email mis à jour");
