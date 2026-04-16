@@ -68,7 +68,7 @@ export async function addFeedbackToNotion(data: {
         database_id: process.env.NOTION_FEEDBACK_DATABASE_ID!,
       },
       properties: {
-        "Client": {
+        "Clients": {
           relation: [
             {
               id: data.clientId,
@@ -103,23 +103,7 @@ export async function addFeedbackToNotion(data: {
             ],
           },
         }),
-        ...(data.atelier && {
-          "Atelier": {
-            rich_text: [
-              {
-                text: {
-                  content: data.atelier,
-                },
-              },
-            ],
-          },
-        }),
-        "Date": {
-          date: {
-            start: new Date().toISOString().split("T")[0],
-          },
-        },
-        "Email Envoyé": {
+        "Email envoyé": {
           checkbox: false,
         },
       },
@@ -138,7 +122,7 @@ export async function updateFeedbackEmailSent(feedbackId: string) {
     await notion.pages.update({
       page_id: feedbackId,
       properties: {
-        "Email Envoyé": {
+        "Email envoyé": {
           checkbox: true,
         },
       },
