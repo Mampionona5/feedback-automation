@@ -55,6 +55,7 @@ export async function addClientToNotion(data: {
 
 export async function addFeedbackToNotion(data: {
   clientId: string;
+  clientName: string;
   noteContenu: number;
   noteGlobale: number;
   appreciation?: string;
@@ -72,7 +73,7 @@ export async function addFeedbackToNotion(data: {
           title: [
             {
               text: {
-                content: data.clientId,
+                content: data.clientName,
               },
             },
           ],

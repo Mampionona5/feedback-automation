@@ -86,6 +86,7 @@ export async function POST(request: NextRequest) {
 
     const feedbackId = await addFeedbackToNotion({
       clientId,
+      clientName: prenom,
       noteContenu: Number(noteContenu),
       noteGlobale: Number(noteGlobale),
       appreciation: fields["Qu'avez vous le plus apprécié ?"],
