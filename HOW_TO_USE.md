@@ -1,5 +1,21 @@
 # 🎬 Comment Utiliser le Projet - Guide Étape par Étape
 
+> **Status:** ✅ Production Ready - Le webhook Tally → Notion → Email fonctionne parfaitement!
+
+## 📢 Résumé de Session
+
+Après une série de débogage sur Vercel, tous les problèmes ont été résolus:
+- ✅ Domain routing configuré
+- ✅ API clients initialisés à runtime (pas au build)
+- ✅ Database IDs Notion corrigés
+- ✅ Property names Notion alignés
+- ✅ Type de données Client changé de relation à title
+- ✅ Email configuration prête (en attente du domaine personnalisé)
+
+**Consultez [SESSION_SUMMARY.md](./SESSION_SUMMARY.md) pour les détails techniques**
+
+---
+
 ## 🎯 Objectif
 Lancer le serveur local et tester le workflow complet : Formulaire → Notion → Email
 
