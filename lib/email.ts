@@ -1,7 +1,5 @@
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 interface EmailData {
   to: string;
   name: string;
@@ -9,7 +7,15 @@ interface EmailData {
   feedback?: string;
 }
 
+function getResendClient() {
+  if (!process.env.RESEND_API_KEY) {
+    throw new Error("RESEND_API_KEY is not set");
+  }
+  return new Resend(process.env.RESEND_API_KEY);
+}
+
 export async function sendThankYouEmail(data: EmailData) {
+  const resend = getResendClient();
   try {
     const response = await resend.emails.send({
       from: "attimo@resend.dev",

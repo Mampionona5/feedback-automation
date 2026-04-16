@@ -1,16 +1,20 @@
 import { Client } from "@notionhq/client";
 
-const notion = new Client({
-  auth: process.env.NOTION_API_KEY,
-});
-
-export const notionClient = notion;
+function getNotionClient() {
+  if (!process.env.NOTION_API_KEY) {
+    throw new Error("NOTION_API_KEY is not set");
+  }
+  return new Client({
+    auth: process.env.NOTION_API_KEY,
+  });
+}
 
 export async function addClientToNotion(data: {
   name: string;
   email: string;
   phone?: string;
 }) {
+  const notion = getNotionClient();
   try {
     const response = await notion.pages.create({
       parent: {
@@ -57,6 +61,7 @@ export async function addFeedbackToNotion(data: {
   aspects?: string;
   atelier?: string;
 }) {
+  const notion = getNotionClient();
   try {
     const response = await notion.pages.create({
       parent: {
@@ -128,6 +133,7 @@ export async function addFeedbackToNotion(data: {
 }
 
 export async function updateFeedbackEmailSent(feedbackId: string) {
+  const notion = getNotionClient();
   try {
     await notion.pages.update({
       page_id: feedbackId,
