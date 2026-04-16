@@ -141,7 +141,7 @@ export async function POST(request: NextRequest) {
 export async function GET() {
   return NextResponse.json({
     status: "ok",
-    message: "Webhook Tally prêt à recevoir des données",
+    message: "Webhook Tally prêt à recevoir des données (v1)",
     timestamp: new Date().toISOString(),
   });
 }
