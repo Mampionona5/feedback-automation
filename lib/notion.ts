@@ -69,9 +69,11 @@ export async function addFeedbackToNotion(data: {
       },
       properties: {
         "Clients": {
-          relation: [
+          title: [
             {
-              id: data.clientId,
+              text: {
+                content: data.clientId,
+              },
             },
           ],
         },
